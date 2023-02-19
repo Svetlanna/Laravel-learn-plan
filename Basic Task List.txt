@@ -1,0 +1,121 @@
+Basic Task List
+
+
+Introduction
+Installation + 
+Prepping The Database +
+
+Database Migrations
+	 php artisan make:migration create_tasks_table --create=tasks
+	php artisan migrate
+	
+	
+
+Eloquent Models
+	Eloquent is Laravel's default ORM (object-relational mapper).
+	 Eloquent makes it painless to retrieve and store data in your database using clearly defined "models". 
+	Usually, each Eloquent model corresponds directly with a single database table.
+
+ The Routes
+		use App\Task;//MODEL
+		use Illuminate\Http\Request;
+ 
+		Route::get('/', function () {    //
+		});
+		Route::post('/task', function (Request $request) {
+  		  //
+		});	
+
+		Route::delete('/task/{id}', function ($id) {
+   		 //
+		});
+
+ 
+	Displaying A View
+		Displaying A View
+	Route::get('/', function () {
+  	  return view('tasks');
+	});
+
+		Building Layouts & Views
+		Defining The Layout
+		Defining The Child View
+		Adding Tasks
+	Validation
+	Route::post('/task', function (Request $request) {
+    $validator = Validator::make($request->all(), [
+        'name' => 'required|max:255',
+    ]);
+ 
+    if ($validator->fails()) {
+        return redirect('/')
+            ->withInput()
+            ->withErrors($validator);
+    }
+ 
+    // Create The Task...
+});
+
+
+Creating The Task
+Route::post('/task', function (Request $request) {
+    $validator = Validator::make($request->all(), [
+        'name' => 'required|max:255',
+    ]);
+ 
+    if ($validator->fails()) {
+        return redirect('/')
+            ->withInput()
+            ->withErrors($validator);
+    }
+ 
+    $task = new Task;
+    $task->name = $request->name;
+    $task->save();
+ 
+    return redirect('/');
+});
+
+Displaying Existing Tasks
+
+Route::get('/', function () {
+    $tasks = Task::orderBy('created_at', 'asc')->get();
+ 
+    return view('tasks', [
+        'tasks' => $tasks
+    ]);
+});
+
+Deleting Tasks
+<tr>
+    <!-- Task Name -->
+    <td class="table-text">
+        <div>{{ $task->name }}</div>
+    </td>
+ 
+    <!-- Delete Button -->
+    <td>
+        <form action="/task/{{ $task->id }}" method="POST">
+            {{ csrf_field() }}
+            {{ method_field('DELETE') }}
+ 
+            <button>Delete Task</button>
+        </form>
+    </td>
+</tr>
+
+Adding The Delete Button
+<input type="hidden" name="_method" value="DELETE">
+
+Deleting The Task
+Finally, let's add logic to our route to actually delete the given task. We can use the Eloquent findOrFail method to retrieve a model by ID or throw a 404 exception if the model does not exist. Once we retrieve the model, we will use the delete method to delete the record. Once the record is deleted, we will redirect the user back to the / URL:
+
+
+
+Deleting The Task
+Route::delete('/task/{id}', function ($id) {
+    Task::findOrFail($id)->delete();
+ 
+    return redirect('/');
+});
+
